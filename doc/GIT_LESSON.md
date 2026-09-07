@@ -197,6 +197,78 @@ Fetchで確認した内容を、実際に自分の `main` に取り込みます�
 
 ---
 
+## Step 10（応用）：Pull Requestを使ったチーム開発の流れ
+
+Step 4〜5では「ローカルでブランチを作り、ローカルでマージ」してからPushしました。
+これは個人開発では問題ありませんが、**実務のチーム開発ではもっと一般的な流れ**があります。
+
+```
+ブランチ作成 → すぐPush → 変更するたびコミット＆Push → GitHub上でPull Request作成
+→ レビュー → GitHub上でMerge → ローカルはPullするだけ
+```
+
+マージという操作が「ローカル」ではなく「GitHub側（PR経由）」で起きるのが最大の違いです。
+実際に体験してみましょう。
+
+### 10-1. ブランチを作ってすぐPushする
+
+1. 左下のブランチ名をクリック →「**+ Create new branch...**」
+2. `feature/practice-pr` と入力してEnter
+3. `lib/main.dart` の `tooltip: 'Increment'` を `tooltip: '追加する'` に変更して保存
+4. ソース管理パネルで「+」ステージ →メッセージ `tooltipの文言を変更` →チェックマークでコミット
+5. ソース管理パネル上部（または左下）に表示される「**Publish Branch**」ボタンをクリックする
+   → これで `feature/practice-pr` ブランチが**そのままの状態で**GitHub上にも作成されます
+   （`main` にはまだ一切変更は反映されていません）
+
+### 10-2. 変更を続けてPushし続ける
+
+1. 続けて `lib/main.dart` の `'You have pushed the button this many times:'` を
+   `'ボタンを押した回数:'` に変更して保存
+2. ステージ →コミット（メッセージ例：`表示文言を日本語化`）
+3. 左下の雲アイコン（**Sync Changes**）をクリックしてPush
+   → 同じ `feature/practice-pr` ブランチに2つ目のコミットが追加される
+
+**ポイント**：新しいブランチは作らず、同じブランチに何度もコミット＆Pushを繰り返しています。
+
+### 10-3. GitHub上でPull Requestを作成する
+
+1. ブラウザでGitHubのリポジトリページを開く
+2. 「`feature/practice-pr` had recent pushes」のような黄色いバナーが表示されるので
+   「**Compare & pull request**」をクリック
+   （表示されない場合は「Pull requests」タブ →「New pull request」→
+   base: `main` ← compare: `feature/practice-pr` を選択）
+3. タイトルと説明を入力し、「**Create pull request**」をクリック
+
+これで、`feature/practice-pr` の変更内容を `main` に取り込むための
+「提案（Pull Request）」がGitHub上にできました。「Files changed」タブを開くと、
+差分がレビュー画面として表示されることも確認してみましょう。
+
+### 10-4. マージする（GitHub上で）
+
+1. Pull Requestの画面下部にある「**Merge pull request**」をクリック
+2. 「Confirm merge」をクリックして確定する
+3. マージ後に表示される「**Delete branch**」ボタンをクリックし、
+   GitHub上のリモートブランチを削除する（任意ですが、実務でもよく行われます）
+
+### 10-5. ローカル側を最新化する
+
+1. VSCodeに戻り、左下のブランチ名をクリックして `main` に切り替える
+2. `Cmd+Shift+P` → `Git: Pull` を実行する
+   → PRでマージされた内容が `main` に反映される
+3. 不要になったローカルの `feature/practice-pr` ブランチを削除する
+   （`Cmd+Shift+P` → `Git: Delete Branch...` → `feature/practice-pr`）
+
+**Step 4〜5との違いのまとめ**
+
+| | Step 4〜5（ローカルマージ） | Step 10（PRマージ） |
+|---|---|---|
+| マージする場所 | ローカル（`Git: Merge Branch...`） | GitHub上（Pull Requestの「Merge」ボタン） |
+| ブランチをPushするタイミング | マージが終わった後（`main`をPush） | ブランチ作成直後から都度Push |
+| レビュー | できない | PR画面でレビュー・コメントができる |
+| 向いている場面 | 個人開発・簡単な修正 | チーム開発・GitHubを使う現場全般 |
+
+---
+
 ## Fetch と Pull の違いまとめ
 
 | | 何をするか | ローカルのファイルへの影響 |
@@ -240,6 +312,7 @@ Pull  =  Fetch  +  取り込み（マージ）
 3. Step 4〜5：ブランチ作成 → 変更 → マージ
 4. Step 6〜7：GitHubへPublish → 追加コミットのPush
 5. Step 8〜9：GitHub側で変更 → Fetchで確認 → Pullで取り込み
+6. Step 10（応用）：ブランチを早めにPush → Pull Requestでレビュー・マージ（実務寄りの流れ）
 
 一通り終えたら、`lib/main.dart` の別の場所（ボタンのテキストや色など）を
 変えてブランチ作成からもう一周してみると、UI操作が体に馴染みます。
